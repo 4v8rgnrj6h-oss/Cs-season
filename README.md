@@ -1,12 +1,8 @@
 # CS Season
 
-CS all-time draft game: build a team from the best Counter-Strike
-players of all time, ban maps, and play a 200-match season.
+CS all-time draft game: build a team from the best Counter-Strike players of all time, ban maps, and play a 200-match season.
 
-CS бүх цаг үеийн драфт тоглоом: шилдэг тоглогчдоос баг бүрдүүл,
-газар хориглож, 200 тоглолтын улирал тогло.
-
-Play / Тоглох: https://[таны-нэр].github.io/cs-season
+CS бүх цаг үеийн драфт тоглоом: шилдэг тоглогчдоос баг бүрдүүл, газар хориглож, 200 тоглолтын улирал тогло.
 
 ## How to play
 1. Pick a player for 6 slots: Entry, AWPer, Lurker, Support, IGL, Coach.
@@ -17,5 +13,3 @@ Play / Тоглох: https://[таны-нэр].github.io/cs-season
 ## Notes
 - Fan project, not affiliated with HLTV or any team.
 - Player stats are approximate unless marked with a check mark.
-
-© 2026 [Таны нэр]. All rights reserved.
