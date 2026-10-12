@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,700;1,600;1,800&display=swap" rel="stylesheet">
+<title>CS Season Драфт</title>
+<meta name="description" content="CS all-time draft: build a team, ban maps, play a 200-match season.">
+<meta name="theme-color" content="#05070d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%AF%3C/text%3E%3C/svg%3E">
+<style>
+:root{--bg:#05070d;--card:#0c1220;--ink:#fff;--mute:#8b94a7;--line:#2a2f3d;--acc:#ff7a1f;--acc2:#4cc9a6;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;font-size:18px}
+main{max-width:520px;margin:0 auto;padding:16px}
+h1{margin:0;font-size:34px;letter-spacing:.5px}
+.sub{color:var(--mute);margin:2px 0 14px;font-size:16px}
+.slots{display:flex;gap:6px;margin-bottom:14px}
+.slot{flex:1;border:2px solid var(--line);border-radius:6px;padding:6px 2px;text-align:center;font-size:14px;color:var(--mute);min-height:46px}
+.slot.on{border-color:var(--acc);color:var(--ink)}
+.slot b{display:block;font-size:13px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.q{font-size:22px;margin:4px 0 10px}
+.opt{display:block;width:100%;text-align:left;background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:6px;padding:12px;margin-bottom:10px;font:inherit;cursor:pointer}
+.opt:active,.opt:focus-visible{border-color:var(--acc);outline:none}
+.nm{font-size:26px;font-weight:700}
+.tm{color:var(--mute);font-size:15px}
+.st{display:flex;gap:18px;margin-top:6px}
+.st span{font-size:20px;font-weight:700}.st small{display:block;font-size:12px;color:var(--mute);font-weight:400}
+.big{font-size:84px;font-weight:800;line-height:1;margin:6px 0;color:var(--acc)}
+.grade{font-size:22px;margin-bottom:10px}
+.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
+.row i{font-style:normal;color:var(--mute)}
+.btn{font:inherit;font-size:20px;font-weight:700;border:0;border-radius:6px;padding:12px 16px;cursor:pointer;background:var(--acc);color:#fff;margin:12px 8px 0 0}
+.btn.alt{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.txt{color:var(--mute);margin:10px 0;line-height:1.35}
+.scroll{overflow-x:auto}
+body{background:radial-gradient(ellipse at 50% 0,#1c2238,var(--bg) 60%) no-repeat var(--bg)}
+h1,.nm,.big,.btn{font-style:italic;text-transform:uppercase}
+h1{color:var(--acc)}
+.opt{border-left:4px solid var(--acc);background:linear-gradient(90deg,#1a1410,var(--card))}
+.slot.on{box-shadow:0 0 12px #ff7a1f55}
+.btn{box-shadow:0 0 14px #ff7a1f44}.btn.alt{box-shadow:none}
+.row i{font-size:13px;text-align:right;margin-left:10px}
+.lang{display:flex;gap:6px;justify-content:flex-end;margin-bottom:6px}.lb{font:inherit;font-size:15px;font-weight:700;background:transparent;color:var(--mute);border:2px solid var(--line);border-radius:6px;padding:2px 10px;cursor:pointer}.lb.on{color:#fff;background:var(--acc);border-color:var(--acc)}
+.opt{transition:border-color .15s,transform .15s}.opt:hover{border-color:var(--acc)}.opt:active{transform:scale(.99)}
+.slot.done{border-color:#4cc9a655}.slot.done b{color:var(--acc2)}
+.bar{display:flex;gap:2px;margin:6px 0 12px}.tile{flex:1;height:10px;border-radius:2px;transform-origin:bottom;animation:pop .22s both}
+@keyframes pop{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.grade.g0,.big.gold{color:#ffc83d}.grade.g4{color:var(--mute)}.big.gold{text-shadow:0 0 24px #ffc83d88}
+.btn:focus-visible,.lb:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.dim{display:grid;grid-template-columns:130px 1fr 30px;gap:8px;align-items:center;font-size:15px;color:var(--mute);margin:4px 0}.dim div{height:8px;background:var(--line);border-radius:4px}.dim i{display:block;height:100%;background:var(--acc);border-radius:4px}.dim b{color:var(--ink);text-align:right}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:2px 8px;margin:0 6px 6px 0;font-size:15px;color:var(--mute)}.chip.good{color:var(--acc2);border-color:var(--acc2)}
+.opt.r-l{border-left-color:#ffc83d;background:linear-gradient(90deg,#2a2008,var(--card));box-shadow:0 0 14px #ffc83d33}.opt.r-l .st span:first-child{color:#ffc83d}
+.opt.r-e{border-left-color:#b983ff;background:linear-gradient(90deg,#1c1230,var(--card))}
+.opt.r-r{border-left-color:#4aa3ff;background:linear-gradient(90deg,#0d1a2c,var(--card))}
+.opt.r-c{border-left-color:#4a5368;background:var(--card)}
+.rb{font-size:12px;padding:1px 6px;border-radius:4px;margin-left:6px;text-transform:uppercase;letter-spacing:.5px;border:1px solid currentColor}
+.rb.r-l{color:#ffc83d}.rb.r-e{color:#b983ff}.rb.r-r{color:#4aa3ff}.rb.r-c{color:var(--mute)}
+.bud{display:flex;align-items:center;gap:8px;margin:2px 0 6px;font-size:18px}.bud div{flex:1;height:8px;background:var(--line);border-radius:4px}.bud i{display:block;height:100%;background:#ffc83d;border-radius:4px}
+.opt.off{opacity:.38;cursor:not-allowed}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}.mg .opt{margin:0;padding:10px;font-size:20px}.mg .opt b{float:right;color:var(--acc)}
+.okc{color:var(--acc2);font-style:normal;font-weight:700}.noc{color:#e5645a;font-style:normal;font-weight:700}
+.bar{gap:0}.tile{min-width:1px}
+.big{font-size:min(72px,16vw);white-space:nowrap}
+.row i.okc,.row i.noc{font-size:22px}.row i.okc{color:var(--acc2)}.row i.noc{color:#e5645a}
+.bud{flex-wrap:wrap}.bud span{flex:1 1 100%}.bud div{flex:1 1 100%}
+.mg .opt{font-size:18px}.mg .opt small{color:var(--mute);font-size:12px;margin-left:4px}
+details{margin-top:6px}summary{cursor:pointer;font-size:20px;padding:10px 0;border-bottom:1px solid var(--line);list-style:none}
+summary::-webkit-details-marker{display:none}summary::before{content:"▸ ";color:var(--acc)}details[open]>summary::before{content:"▾ "}
+.btn:focus-visible,.lb:focus-visible,summary:focus-visible{outline:2px solid #fff;outline-offset:2px}
+</style>
+</head>
+<body>
+<main id="app" aria-live="polite"></main>
+<noscript>JavaScript is required.</noscript>
+<script>
+// name, team, year, role, HLTV-style rating, K/D, ADR (ойролцоо утгууд)
+var P=[
+["s1mple","NAVI",2021,"AWPer",1.35,1.45,88,0.88],["ZywOo","Vitality",2022,"AWPer",1.30,1.38,85],["device","Astralis",2018,"AWPer",1.24,1.30,80],
+["m0NESY","G2",2023,"AWPer",1.25,1.35,81],["kennyS","Titan",2015,"AWPer",1.17,1.20,76],["GuardiaN","NAVI",2016,"AWPer",1.17,1.22,76],
+["NiKo","G2",2021,"Entry",1.21,1.28,87,0.78],["Twistzz","Liquid",2019,"Entry",1.15,1.18,74,0.72],["flameZ","Vitality",2024,"Entry",1.20,1.22,82],
+["Spinx","Vitality",2024,"Entry",1.20,1.25,79],["Ax1Le","Gambit",2021,"Entry",1.18,1.20,81,0.74],["KRIMZ","Fnatic",2015,"Entry",1.13,1.15,73],
+["ropz","FaZe",2022,"Lurker",1.20,1.25,78],["Xyp9x","Astralis",2018,"Lurker",1.12,1.15,70],["f0rest","NiP",2013,"Lurker",1.20,1.25,77],
+["GeT_RiGhT","NiP",2013,"Lurker",1.18,1.22,76],["coldzera","SK",2016,"Lurker",1.22,1.27,80],["olofmeister","Fnatic",2015,"Lurker",1.22,1.25,79],
+["dupreeh","Astralis",2018,"Support",1.14,1.15,74],["Magisk","Astralis",2018,"Support",1.10,1.12,70],["Brollan","MOUZ",2023,"Support",1.15,1.17,75],
+["Snax","Virtus.pro",2014,"Support",1.12,1.13,72],["Stewie2K","Liquid",2018,"Support",1.07,1.08,71],["Hunter","G2",2019,"Support",1.10,1.11,71],
+["karrigan","FaZe",2022,"IGL",1.00,0.99,64],["gla1ve","Astralis",2018,"IGL",1.05,1.05,68],["FalleN","SK",2016,"IGL",1.08,1.10,70],
+["apEX","Vitality",2023,"IGL",0.98,0.95,66],["Zeus","NAVI",2014,"IGL",1.05,1.04,69],["Boombl4","NAVI",2019,"IGL",1.05,1.05,68],
+["ZywOo","Vitality",2024,"AWPer",1.32,1.40,86],["m0NESY","G2",2024,"AWPer",1.25,1.33,81],["sh1ro","Spirit",2024,"AWPer",1.22,1.30,78],["w0nderful","NAVI",2024,"AWPer",1.15,1.18,76],
+["donk","Spirit",2024,"Entry",1.35,1.40,88],["xertioN","MOUZ",2024,"Entry",1.15,1.18,78],["NiKo","G2",2024,"Entry",1.15,1.17,80],
+["frozen","MOUZ",2024,"Lurker",1.20,1.22,79],["ropz","FaZe",2024,"Lurker",1.15,1.18,75],["Jimpphat","MOUZ",2025,"Lurker",1.22,1.25,80],["b1t","NAVI",2024,"Lurker",1.12,1.14,74],
+["Brollan","MOUZ",2024,"Support",1.12,1.13,74],["Magixx","Spirit",2024,"Support",1.08,1.08,71],["mezii","Vitality",2024,"Support",1.10,1.11,72],["iM","NAVI",2024,"Support",1.10,1.12,73],
+["chopper","Spirit",2024,"IGL",0.97,0.96,66],["apEX","Vitality",2024,"IGL",0.98,0.97,66],["Aleksib","NAVI",2024,"IGL",0.95,0.94,65],["karrigan","MOUZ",2024,"IGL",0.97,0.96,65],
+["sh1ro","Gambit",2021,"AWPer",1.24,1.32,76,0.76],["Jame","Virtus.pro",2020,"AWPer",1.15,1.17,74],["electroNic","NAVI",2021,"Entry",1.14,1.19,80,0.71],
+["shox","EnVyUs",2016,"Entry",1.13,1.15,76],["tarik","Cloud9",2018,"Entry",1.10,1.11,74],["b1t","NAVI",2021,"Lurker",1.10,1.20,73,0.68],
+["Edward","NAVI",2014,"Support",1.08,1.08,70],["fer","SK",2016,"Support",1.13,1.14,73],["Perfecto","NAVI",2021,"Support",1.05,1.05,66],["TaZ","Virtus.pro",2014,"IGL",0.98,0.97,65],
+["m0NESY","Falcons",2025,"AWPer",1.27,1.35,82],["torzsi","MOUZ",2024,"AWPer",1.15,1.17,75],["NiKo","Falcons",2025,"Entry",1.18,1.20,81],
+["TeSeS","Falcons",2025,"Entry",1.15,1.17,78],["flameZ","Vitality",2025,"Entry",1.20,1.22,82],["ropz","Vitality",2025,"Lurker",1.20,1.22,79],
+["Twistzz","FaZe",2024,"Entry",1.12,1.13,76],["Magisk","Falcons",2025,"Support",1.12,1.13,74],["kyxsan","Falcons",2025,"Support",1.08,1.08,70],["HeavyGod","Falcons",2025,"IGL",0.98,0.97,66],
+["zont1x","Spirit",2024,"Entry",1.15,1.17,77],["siuhy","MOUZ",2025,"IGL",0.97,0.96,65],["malbsMd","G2",2024,"Support",1.10,1.11,72],["HooXi","G2",2024,"IGL",0.95,0.93,63],
+["broky","FaZe",2024,"AWPer",1.15,1.17,76],["rain","FaZe",2024,"Entry",1.08,1.08,73],["EliGE","FaZe",2024,"Entry",1.10,1.11,75],["NAF","Liquid",2024,"Support",1.08,1.08,72],
+["KSCERATO","FURIA",2025,"Entry",1.18,1.20,79],["yuurih","FURIA",2025,"Support",1.12,1.14,74],["molodoy","FURIA",2025,"AWPer",1.10,1.12,73],["YEKINDAR","FURIA",2025,"Entry",1.12,1.14,76],
+["FalleN","FURIA",2025,"IGL",1.00,1.00,68],["Jee","TYLOO",2025,"Support",1.05,1.05,69],["Mercury","TYLOO",2025,"Lurker",1.06,1.06,70],["degster","Falcons",2025,"Entry",1.15,1.17,78],
+["bLitz","The MongolZ",2025,"IGL",1.02,1.02,68],["Techno","The MongolZ",2025,"Lurker",1.12,1.13,74],["Senzu","The MongolZ",2025,"Entry",1.12,1.14,76],["910","The MongolZ",2025,"AWPer",1.12,1.15,74],["mzinho","The MongolZ",2025,"Support",1.08,1.08,70],
+["Summer","TYLOO",2018,"AWPer",1.12,1.14,74],["somebody","TYLOO",2018,"Entry",1.10,1.12,75],["Attacker","TYLOO",2018,"Lurker",1.06,1.07,70],["Mo","TYLOO",2018,"IGL",0.96,0.95,64],["DANK1NG","TYLOO",2019,"Support",1.05,1.05,69],
+["Skadoodle","Cloud9",2018,"AWPer",1.10,1.12,73],["autimatic","Cloud9",2018,"Lurker",1.08,1.09,72],["RUSH","Cloud9",2018,"Entry",1.05,1.05,71],
+["EliGE","Liquid",2019,"Entry",1.21,1.20,86,0.78],["NAF","Liquid",2019,"Support",1.18,1.14,83,0.73],["nitr0","Liquid",2019,"IGL",1.05,1.05,69],
+["HObbit","Gambit",2021,"Support",1.18,1.11,82,0.74],["interz","Gambit",2021,"Lurker",1.10,1.12,73],["nafany","Gambit",2021,"IGL",0.95,0.94,64],
+["stavn","Heroic",2022,"Entry",1.20,1.25,80],["TeSeS","Heroic",2022,"Entry",1.12,1.14,76],["cadiaN","Heroic",2022,"AWPer",1.08,1.10,72],["sjuush","Heroic",2022,"Support",1.05,1.05,69],["refrezh","Heroic",2022,"Support",1.07,1.08,70],
+["flusha","Fnatic",2015,"Entry",1.18,1.22,79],["JW","Fnatic",2015,"AWPer",1.12,1.15,75],["pronax","Fnatic",2015,"IGL",1.00,1.00,67],["friberg","NiP",2013,"Support",1.12,1.14,73],["Xizt","NiP",2013,"IGL",1.00,1.00,66],
+["rain","FaZe",2022,"Entry",1.12,1.14,76],["broky","FaZe",2022,"AWPer",1.15,1.18,76],
+["KSCERATO","FURIA",2020,"Entry",1.17,1.20,79],["yuurih","FURIA",2020,"Support",1.12,1.14,75],["arT","FURIA",2020,"IGL",1.02,1.02,68],["VINI","FURIA",2020,"Lurker",1.08,1.10,72],
+["bLitz","The MongolZ",2023,"IGL",1.00,1.00,66],["Techno","The MongolZ",2023,"Lurker",1.10,1.12,73],["Senzu","The MongolZ",2023,"Entry",1.10,1.12,75],["910","The MongolZ",2023,"AWPer",1.10,1.13,73],["mzinho","The MongolZ",2023,"Support",1.06,1.06,69],
+["bLitz","The MongolZ",2024,"IGL",1.01,1.01,67],["Techno","The MongolZ",2024,"Lurker",1.11,1.12,74],["Senzu","The MongolZ",2024,"Entry",1.12,1.13,76],["910","The MongolZ",2024,"AWPer",1.12,1.14,74],["mzinho","The MongolZ",2024,"Support",1.07,1.07,70],
+["ZywOo","Vitality",2021,"AWPer",1.29,0,84,0.81],
+["YEKINDAR","Virtus.pro",2021,"Entry",1.14,0,84,0.74],
+["Jame","Virtus.pro",2021,"AWPer",1.16,0,72,0.70],
+["dev1ce","Astralis",2021,"AWPer",1.14,0,77,0.73],
+["huNter-","G2",2021,"Support",1.11,0,80,0.74],
+["blameF","Complexity",2021,"Support",1.15,0,82,0.71],
+["NAF","Liquid",2021,"Support",1.13,0,80,0.71],
+["KSCERATO","FURIA",2021,"Entry",1.16,0,81,0.74],
+["stavn","Heroic",2021,"Entry",1.10,0,80,0.69],
+["Twistzz","FaZe",2021,"Entry",1.12,0,76,0.72],
+["ropz","MOUZ",2021,"Lurker",1.17,0,80,0.77],
+["EliGE","Liquid",2021,"Entry",1.11,0,81,0.72],
+["broky","FaZe",2021,"AWPer",1.10,0,74,0.71],
+["ZywOo","Vitality",2019,"AWPer",1.30,0,86,0.83],
+["s1mple","NAVI",2019,"AWPer",1.29,0,84,0.84],
+["device","Astralis",2019,"AWPer",1.22,0,81,0.77],
+["Magisk","Astralis",2019,"Support",1.17,0,81,0.72],
+["electroNic","NAVI",2019,"Entry",1.22,0,85,0.76],
+["Brehze","Evil Geniuses",2019,"Entry",1.15,0,80,0.76],
+["ropz","mousesports",2019,"Lurker",1.20,0,81,0.77],
+["NiKo","FaZe",2019,"Entry",1.16,0,83,0.77],
+["woxic","mousesports",2019,"AWPer",1.16,0,77,0.74],
+["sergej","ENCE",2019,"Support",1.11,0,78,0.71],
+["Xyp9x","Astralis",2019,"Lurker",1.11,0,75,0.67],
+["jks","Renegades",2019,"Lurker",1.15,0,81,0.74],
+["dupreeh","Astralis",2019,"Support",1.11,0,74,0.71],
+["KRIMZ","Fnatic",2019,"Entry",1.10,0,77,0.71],
+["Brollan","Fnatic",2019,"Support",1.10,0,78,0.72],
+["ZywOo","Vitality",2025,"AWPer",1.30,1.38,85],
+["sh1ro","Spirit",2025,"AWPer",1.22,1.28,78],
+["donk","Spirit",2025,"Entry",1.33,1.38,87],
+["apEX","Vitality",2025,"IGL",0.98,0.96,66],
+["mezii","Vitality",2025,"Support",1.10,1.11,72],
+["Spinx","Vitality",2025,"Entry",1.18,1.20,78],
+["karrigan","FaZe",2025,"IGL",0.97,0.96,65],
+["s1mple","FaZe",2025,"AWPer",1.15,1.18,77],
+["EliGE","FaZe",2025,"Entry",1.10,1.12,75],
+["Jimpphat","MOUZ",2024,"Lurker",1.18,1.20,78],
+["Magixx","Spirit",2025,"Support",1.08,1.08,71],
+["chopper","Spirit",2025,"IGL",0.97,0.96,65],
+["Aleksib","NAVI",2025,"IGL",0.95,0.94,64],
+["Twistzz","Liquid",2025,"Entry",1.10,1.11,76],
+["pashaBiceps","Virtus.pro",2014,"Entry",1.12,1.14,76],
+["NEO","Virtus.pro",2014,"Lurker",1.10,1.12,74],
+["byali","Virtus.pro",2014,"Support",1.07,1.08,70],
+["Happy","EnVyUs",2016,"IGL",1.00,1.00,66],
+["kioShiMa","EnVyUs",2016,"Entry",1.12,1.14,75],
+["NBK-","EnVyUs",2016,"Support",1.08,1.08,71],
+["fnx","SK",2016,"Support",1.05,1.06,70],
+["TACO","SK",2016,"Support",1.05,1.05,69],
+["NiKo","FaZe",2017,"Entry",1.23,1.20,87,0.81],
+["rain","FaZe",2017,"Entry",1.16,1.10,84,0.74],
+["olofmeister","FaZe",2017,"Lurker",1.08,1.13,77,0.71],
+["GuardiaN","NAVI",2017,"AWPer",1.12,1.16,73,0.72],
+["karrigan","FaZe",2017,"IGL",0.97,0.96,64],
+["Stewie2K","Cloud9",2018,"Support",1.07,1.08,72],
+["device","Astralis",2020,"AWPer",1.20,1.26,80],
+["blameF","Astralis",2020,"Lurker",1.14,1.15,77],
+["gla1ve","Astralis",2020,"IGL",1.00,0.99,66],
+["Xyp9x","Astralis",2020,"Lurker",1.08,1.09,72],
+["ZywOo","Vitality",2020,"AWPer",1.28,1.38,84],
+["apEX","Vitality",2020,"IGL",1.00,0.98,67],
+["misutaaa","Vitality",2020,"Support",1.05,1.05,68],
+["RpK","Vitality",2020,"Support",1.04,1.04,68],
+["s1mple","NAVI",2020,"AWPer",1.28,1.35,85],
+["Boombl4","NAVI",2020,"IGL",1.05,1.05,68],
+["flamie","NAVI",2019,"Entry",1.07,1.08,72],
+["Brehze","Evil Geniuses",2020,"Entry",1.13,1.14,78],
+["sh1ro","Cloud9",2022,"AWPer",1.22,1.28,78],
+["Ax1Le","Cloud9",2022,"Entry",1.20,1.22,80],
+["HObbit","Cloud9",2022,"Support",1.08,1.09,72],
+["Boombl4","Cloud9",2022,"IGL",1.00,1.00,66],
+["Perfecto","Cloud9",2022,"Support",1.02,1.02,67],
+["Twistzz","FaZe",2022,"Entry",1.12,1.14,77],
+["Aleksib","NAVI",2022,"IGL",0.97,0.96,65],
+["donk","Spirit",2023,"Entry",1.25,1.30,84],
+["chopper","Spirit",2023,"IGL",0.98,0.97,66],
+["sh1ro","Spirit",2023,"AWPer",1.20,1.26,78],
+["Magixx","Spirit",2023,"Support",1.08,1.08,71],
+["ZywOo","Vitality",2023,"AWPer",1.25,1.32,82],
+["mezii","Vitality",2023,"Support",1.08,1.08,71],
+["Jimpphat","MOUZ",2023,"Lurker",1.15,1.17,76],
+["frozen","MOUZ",2023,"Lurker",1.18,1.20,78],
+["torzsi","MOUZ",2023,"AWPer",1.12,1.14,74],
+["coldzera","SK",2017,"Lurker",1.24,0,83,0.82],
+["fer","SK",2017,"Support",1.21,0,87,0.78],
+["device","Astralis",2017,"AWPer",1.18,0,79,0.77],
+["FalleN","SK",2017,"IGL",1.13,0,74,0.69],
+["kennyS","G2",2017,"AWPer",1.18,0,77,0.79],
+["s1mple","NAVI",2017,"AWPer",1.24,0,87,0.84],
+["dupreeh","Astralis",2017,"Support",1.10,0,79,0.72],
+["HObbit","Gambit",2017,"Support",1.12,0,81,0.74],
+["EliGE","Liquid",2017,"Entry",1.13,0,84,0.76],
+["Xyp9x","Astralis",2017,"Lurker",1.09,0,78,0.67],
+["k0nfig","North",2017,"Entry",1.11,0,79,0.74],
+["Kjaerbye","Astralis",2017,"Entry",1.10,0,76,0.71],
+["oskar","mousesports",2017,"AWPer",1.18,0,82,0.78],
+["AdreN","Gambit",2017,"IGL",1.08,0,81,0.72],
+["boltz","SK",2017,"Support",1.10,0,81,0.71],
+["Snax","Virtus.pro",2017,"Support",1.10,0,76,0.70],
+["zonic","Astralis",2018,"Coach",95,0,0],["B1ad3","NAVI",2021,"Coach",90,0,0],["zonic","Heroic",2022,"Coach",85,0,0],
+["mithR","Spirit",2024,"Coach",88,0,0],["XTQZZZ","Vitality",2024,"Coach",86,0,0],["XTQZZZ","Vitality",2025,"Coach",94,0,0],["maaRaa","The MongolZ",2024,"Coach",82,0,0],["maaRaa","The MongolZ",2025,"Coach",86,0,0],
+// v0.5: нэмэлт өгөгдөл (ойролцоо утга, ✓ үгүй)
+["XANTARES","Eternal Fire",2024,"Entry",1.13,0,80],
+["jabbi","Astralis",2024,"Entry",1.08,0,77],
+["stavn","Astralis",2024,"Entry",1.10,0,78],
+["fame","Virtus.pro",2024,"Entry",1.06,0,74],
+["Ax1Le","Cloud9",2024,"Entry",1.10,0,77],
+["electroNic","Cloud9",2024,"Entry",1.07,0,75],
+["Grim","Complexity",2024,"Entry",1.04,0,72],
+["hallzerk","Complexity",2024,"AWPer",1.10,0,75],
+["SunPayus","Heroic",2025,"AWPer",1.12,0,76],
+["ICY","Virtus.pro",2025,"AWPer",1.05,0,72],
+["gr1ks","Heroic",2025,"AWPer",1.05,0,70],
+["nqz","paiN",2024,"AWPer",1.07,0,72],
+["jL","NAVI",2024,"Lurker",1.18,0,78],
+["Dosia","Gambit",2017,"Lurker",1.08,0,74],
+["Hiko","Liquid",2016,"Lurker",1.06,0,72],
+["Perfecto","Cloud9",2024,"Support",1.05,0,70],
+["HObbit","Cloud9",2024,"Support",1.04,0,70],
+["JT","Complexity",2024,"Support",1.03,0,70],
+["MAJ3R","Eternal Fire",2024,"IGL",0.99,0,66],
+["Boombl4","Cloud9",2024,"IGL",0.99,0,66],
+["cadiaN","Liquid",2024,"IGL",0.99,0,66],
+["hally","Spirit",2024,"Coach",91,0,0],
+["hally","Spirit",2025,"Coach",90,0,0],
+["sycrone","MOUZ",2023,"Coach",86,0,0],
+["sycrone","MOUZ",2024,"Coach",88,0,0],
+["sAw","ENCE",2023,"Coach",84,0,0],
+["sAw","Heroic",2024,"Coach",82,0,0],
+["TaZ","G2",2025,"Coach",80,0,0],
+["NEO","FaZe",2023,"Coach",82,0,0],
+["NEO","FaZe",2025,"Coach",82,0,0],
+["TOBIZ","Heroic",2025,"Coach",76,0,0],
+["guerri","FURIA",2025,"Coach",85,0,0],
+["RobbaN","FaZe",2022,"Coach",92,0,0],
+["XomA","Aurora",2024,"Coach",78,0,0],
+["zews","Liquid",2024,"Coach",80,0,0],
+["nawrot","Monte",2024,"Coach",74,0,0],
+["brain","Aurora",2024,"Coach",76,0,0],
+["adreN","Nouns",2024,"Coach",72,0,0],
+["gla1ve","100 Thieves",2026,"Coach",80,0,0],
+["flashie","Liquid",2025,"Coach",72,0,0],
+["zonic","Heroic",2023,"Coach",93,0,0],
+["zonic","Falcons",2025,"Coach",91,0,0],
+["B1ad3","NAVI",2022,"Coach",94,0,0],
+["B1ad3","NAVI",2024,"Coach",95,0,0],
+["XTQZZZ","Vitality",2023,"Coach",90,0,0]
+];
+var ROLES=["Entry","AWPer","Lurker","Support","IGL","Coach"];
+var T={
+mn:{sub:"Бүх цаг үеийн драфт",era:"Аль эриний тоглогчдоос сонгох вэ?",ver:"✓ = HLTV-ийн Top 20-оос баталгаажсан статистик",
+cs2:"CS2 эрин үе",cs2d:"2024 оноос хойших тоглогчид",csgo:"CS:GO эрин үе",csgod:"2013–2023 оны тоглогчид",all:"Хоёр эрин үе",alld:"Бүх тоглогч хамт холилдоно",
+pick:"{0} сонгоно уу",reroll:"Дахин сугалах ({0})",tactic:"Тактик",tac:"тактик {0}",result:"Үр дүн",again:"Дахин драфт",share:"Хуулах",copied:"Хуулсан",fail:"Хуулж чадсангүй",
+top5:"Шилдэг 5 (энэ төхөөрөмж дээр)",avg:"Дундаж рейтинг {0}.",perfect:"30-0 · Төгс улирал",title:"CS Season драфт",
+grades:["S · Домогт баг","A · Маш хүчтэй баг","B · Сайн баг","C · Дундаж баг","D · Сул баг"],
+v:["Домогт баг боллоо. Өрсөлдөгчид таныг зогсоож чадсангүй.","Маш хүчтэй баг, цөөхөн газраар л ялагдлаа.","Найдвартай баг боловч төгс биш байлаа.","Дундаж баг. Зарим тоглолтод хүч дутлаа.","Энэ бүрэлдэхүүн тэргүүлэх багуудтай өрсөхөд хүрэлцсэнгүй."],
+best:"{0} ({1}) багийг ганцаараа ачаалав.",awphi:"{0} AWP-ээрээ өрсөлдөгчийн гол тоглогчдыг цэвэрлэв.",awplo:"AWP-ийн хүч сул байсан нь голын тулаанд мэдрэгдэв.",
+iglhi:"{0} тоглолт удирдахаас гадна өөрөө ч сайн үзүүлэв.",igllo:"{0} баг удирдсан ч өөрийн хувь нэмэр бага байлаа.",worst:"{0} хамгийн сул холбоос боллоо ({1}).",
+chem:"{0} өмнө нь хамт тоглож байсан тул chemistry бонус авлаа.",nochem:"Өмнө нь хамт тоглож байсан хос байхгүй тул chemistry бонус аваагүй.",
+cohi:"Дасгалжуулагч {0} тактикаараа өрсөлдөгчөөсөө илүү байлаа.",colo:"Дасгалжуулагч {0} багийг тогтвортой удирдлаа."},
+en:{sub:"All-time draft",era:"Which era do you want to draft from?",ver:"✓ = stats verified from HLTV Top 20",
+cs2:"CS2 era",cs2d:"Players from 2024 onward",csgo:"CS:GO era",csgod:"Players from 2013–2023",all:"Both eras",alld:"All players mixed together",
+pick:"Pick your {0}",reroll:"Reroll ({0})",tactic:"Tactics",tac:"tactics {0}",result:"Result",again:"Draft again",share:"Copy",copied:"Copied",fail:"Couldn't copy",
+top5:"Top 5 (this device)",avg:"Average rating {0}.",perfect:"30-0 · Perfect season",title:"CS Season draft",
+grades:["S · Legendary team","A · Dominant team","B · Strong team","C · Average team","D · Weak team"],
+v:["A legendary roster. Opponents never found an answer.","A dominant team that dropped only a handful of maps.","A reliable team, but not a perfect one.","An average team that lacked firepower in some games.","This roster couldn't keep up with the top teams."],
+best:"{0} ({1}) carried the team.",awphi:"{0} on the AWP shut down the opposition's key players.",awplo:"Weak AWP firepower showed up in mid-range duels.",
+iglhi:"{0} led the team and fragged well too.",igllo:"{0} led the team, but contributed little individually.",worst:"{0} was the weakest link ({1}).",
+chem:"{0} have played together before, so the team gets a chemistry bonus.",nochem:"No one has played together before, so there is no chemistry bonus.",
+cohi:"Coach {0} out-prepared the opposition tactically.",colo:"Coach {0} kept the team steady."},
+ru:{sub:"Драфт всех времён",era:"Из какой эпохи выбирать игроков?",ver:"✓ = статистика подтверждена по HLTV Top 20",
+cs2:"Эпоха CS2",cs2d:"Игроки с 2024 года",csgo:"Эпоха CS:GO",csgod:"Игроки 2013–2023",all:"Обе эпохи",alld:"Все игроки вперемешку",
+pick:"Выберите: {0}",reroll:"Перемешать ({0})",tactic:"Тактика",tac:"тактика {0}",result:"Результат",again:"Новый драфт",share:"Копировать",copied:"Скопировано",fail:"Не удалось скопировать",
+top5:"Лучшие 5 (на этом устройстве)",avg:"Средний рейтинг {0}.",perfect:"30-0 · Идеальный сезон",title:"CS Season драфт",
+grades:["S · Легендарная команда","A · Очень сильная команда","B · Хорошая команда","C · Середняк","D · Слабая команда"],
+v:["Легендарный состав. Соперники так и не нашли ответа.","Очень сильная команда, проиграно лишь несколько карт.","Надёжная команда, но не идеальная.","Середняк. В некоторых играх не хватило силы.","Этому составу не хватило мощи против топ-команд."],
+best:"{0} ({1}) тащил команду на себе.",awphi:"{0} с AWP выбивал ключевых игроков соперника.",awplo:"Слабая игра с AWP чувствовалась в дуэлях за центр.",
+iglhi:"{0} не только руководил игрой, но и сам играл отлично.",igllo:"{0} руководил командой, но личный вклад был небольшим.",worst:"{0} — самое слабое звено ({1}).",
+chem:"{0}: ранее играли вместе, поэтому есть бонус к химии.",nochem:"Ранее вместе никто не играл, поэтому бонуса к химии нет.",
+cohi:"Тренер {0} переиграл соперников тактически.",colo:"Тренер {0} держал команду стабильной."}};
+var LANG="mn";
+var AL={dev1ce:"device","hunter-":"hunter"};
+function pid(p){var n=p[0].toLowerCase();return AL[n]||n}
+function tm(x){return x==="mousesports"?"MOUZ":x}
+function tier(p){return "r-"+rar(p)}
+function countUp(el,n,tot){var rm=window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches;var f=function(i){el.textContent=i+" - "+(tot-i)};if(rm||!n){f(n);return}var i=0,sp=Math.max(1,Math.ceil(n/40)),h=setInterval(function(){i=Math.min(n,i+sp);f(i);if(i>=n)clearInterval(h)},30)}
+function copyText(x,ok,no){function fb(){try{var a=document.createElement("textarea");a.value=x;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();var r=document.execCommand("copy");document.body.removeChild(a);r?ok():no()}catch(e){no()}}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(x).then(ok,fb)}else fb()}
+try{var sv=localStorage.getItem("cs30lang");if(sv&&T[sv])LANG=sv;else{var nl=(navigator.language||"").slice(0,2);if(T[nl])LANG=nl}}catch(e){}
+function t(k,a,b,c,d){var v=T[LANG][k];if(typeof v!=="string")return v===undefined?k:v;return v.replace("{0}",a).replace("{1}",b).replace("{2}",c).replace("{3}",d)}
+var app=document.getElementById("app");
+var picks,step,opts,pool,eraKey,rr,screen,RS;
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=a[i];a[i]=a[j];a[j]=x}return a}
+var RW={l:3,e:12,r:30,c:55};
+function rar(p){if(p[3]==="Coach")return p[4]>=92?"l":p[4]>=88?"e":p[4]>=84?"r":"c";var a=p[4]+(p[3]==="IGL"?.15:p[3]==="Support"?.07:p[3]==="Lurker"?.05:p[3]==="Entry"?.04:0);return a>=1.27?"l":a>=1.19?"e":a>=1.11?"r":"c"}
+function roll(r,old){var taken=picks.map(pid);var l=pool.filter(function(p){return p[3]===r&&(r==="Coach"||taken.indexOf(pid(p))<0)});var rest=l.filter(function(p){return old.indexOf(p)<0});var src=(rest.length>=3?rest:l).slice(),out=[],seen={};
+  while(src.length&&out.length<4){var tot=0;src.forEach(function(p){tot+=RW[rar(p)]});var x=Math.random()*tot,i=0;for(;i<src.length-1;i++){x-=RW[rar(src[i])];if(x<=0)break}var p=src.splice(i,1)[0];var k=r==="Coach"?out.length+"c":pid(p);if(!seen[k]){seen[k]=1;out.push(p)}}if(!out.some(afford)){var cb=l.slice().sort(function(a,b){return cost(a)-cost(b)})[0];if(cb&&out.indexOf(cb)<0)out[out.length-1]=cb}return out}
+function lbGet(){try{return JSON.parse(localStorage.getItem("cs200lb")||"[]")}catch(e){return[]}}
+function lbSave(r){try{var l=lbGet();l.push(r);l.sort(function(a,b){return b.w-a.w});localStorage.setItem("cs200lb",JSON.stringify(l.slice(0,5)))}catch(e){}}
+function lbHtml(){var l=lbGet();if(!l.length)return"";return '<div class="q" style="margin-top:18px">'+t("top5")+'</div>'+l.map(function(r,i){return '<div class="row"><span>'+(i+1)+'. '+r.a+'-'+r.b+(r.c?' 🏆×'+r.c:'')+' · '+t(r.e)+'</span><i>'+r.n+'</i></div>'}).join("")}
+function head(){return '<div class="lang">'+["mn","en","ru"].map(function(l){return '<button class="lb'+(l===LANG?' on':'')+'" data-l="'+l+'" aria-label="'+({mn:"Монгол",en:"English",ru:"Русский"})[l]+'">'+l.toUpperCase()+'</button>'}).join("")+'</div><h1>CS Season</h1><div class="sub">'+t("sub")+'</div>'}
+function bindLang(){[].forEach.call(app.querySelectorAll(".lb"),function(b){b.onclick=function(){LANG=b.getAttribute("data-l");try{localStorage.setItem("cs30lang",LANG)}catch(e){}render()}})}
+function render(){if(screen==="season")seasonScreen();else if(screen==="draw")draw();else if(screen==="result")showResult();else start()}
+function start(){
+  screen="menu";
+  app.innerHTML=head()+'<div class="q">'+t("era")+'</div><div class="tm" style="margin-bottom:8px">'+t("ver")+'</div>'+
+  [["cs2","cs2d"],["csgo","csgod"],["all","alld"]].map(function(e){return '<button class="opt" data-e="'+e[0]+'"><div class="nm">'+t(e[0])+'</div><div class="tm">'+t(e[1])+'</div></button>'}).join("")+howHtml()+lbHtml()+'<div class="tm" style="margin-top:18px">'+t("foot")+'</div>';
+  [].forEach.call(app.querySelectorAll(".opt"),function(b){b.onclick=function(){begin(b.getAttribute("data-e"))}});
+  bindLang();
+}
+function begin(e){
+  eraKey=e;
+  pool=P.filter(function(p){return e==="all"||(e==="cs2"?p[2]>=2024:p[2]<2024)});
+  bud=BUDGET;MINC={};ROLES.forEach(function(r){var m=1e9;pool.forEach(function(p){if(p[3]===r)m=Math.min(m,cost(p))});MINC[r]=m});
+  picks=[];step=0;rr=2;next();
+}
+function next(){if(step>=6){return result()}opts=roll(ROLES[step],[]);draw()}
+
+T.mn.dims=["Галын хүч","Нээлтийн тулаан","Utility","Trade","Clutch"];T.en.dims=["Firepower","Opening duels","Utility","Trading","Clutch"];T.ru.dims=["Огневая мощь","Открывающие дуэли","Утилити","Трейды","Клатчи"];
+T.mn.dimsh="Багийн үзүүлэлт";T.en.dimsh="Team profile";T.ru.dimsh="Профиль команды";
+T.mn.mapsh="Газрын зургаар";T.en.mapsh="By map";T.ru.mapsh="По картам";
+T.mn.est="~ = Rating, KPR, ADR-аас тооцоолсон үзүүлэлт";T.en.est="~ = estimated from Rating, KPR and ADR";T.ru.est="~ = оценка по Rating, KPR и ADR";
+T.mn.dimlow="Багийн {0} сул байна ({1}). Үүнийг нөхөх тоглогч дутуу байлаа.";T.en.dimlow="The team's {0} is weak ({1}); nobody covered for it.";T.ru.dimlow="{0} команды слабая ({1}); никто не компенсировал это.";
+T.mn.maprec="Хамгийн сайн газар: {0} ({1}), хамгийн муу нь: {2} ({3}).";T.en.maprec="Best map: {0} ({1}); worst map: {2} ({3}).";T.ru.maprec="Лучшая карта: {0} ({1}); худшая: {2} ({3}).";
+T.mn.mapwhy="{0} дээр {1} сул байсан нь мэдрэгдэв.";T.en.mapwhy="On {0}, weak {1} hurt the team.";T.ru.mapwhy="На {0} слабая {1} подвела команду.";
+var MAPS=[["Mirage",[.30,.28,.14,.14,.14]],["Inferno",[.22,.16,.30,.20,.12]],["Nuke",[.24,.14,.22,.14,.26]],["Ancient",[.26,.14,.14,.30,.16]],["Anubis",[.28,.20,.18,.14,.20]],["Dust2",[.30,.34,.08,.12,.16]],["Overpass",[.20,.14,.28,.16,.22]]];
+var DS=["FP","OP","UT","TR","CL"],KEYD={Entry:1,AWPer:1,Lurker:4,Support:2,IGL:2};
+var OFS={Entry:[0,8,-18,-2,-12],AWPer:[4,10,-30,-20,-4],Lurker:[0,-8,-18,-14,12],Support:[-4,-16,16,12,-10],IGL:[-12,-10,14,8,-8]};
+function cl(x){return Math.max(5,Math.min(99,x))}
+function dims(p){var adj=p[3]==="IGL"?.1:p[3]==="Support"?.03:0;var b=(p[4]+adj-.9)/.5*100,o=OFS[p[3]];return [cl(b+(p[6]-75)*.6+o[0]),cl(b+o[1]),cl(b+o[2]),cl(b+o[3]),cl(b+o[4])]}
+function teamDims(){var d=[0,0,0,0,0];for(var i=0;i<5;i++){var x=dims(picks[i]);for(var k=0;k<5;k++)d[k]+=x[k]/5}return d}
+
+T.mn.lg="Ангиллын тоглолтууд";T.en.lg="Regular season";T.ru.lg="Регулярный сезон";
+T.mn.s1="Томоохон тэмцээн #1";T.en.s1="Premier event #1";T.ru.s1="Крупный турнир №1";
+T.mn.s2="Томоохон тэмцээн #2";T.en.s2="Premier event #2";T.ru.s2="Крупный турнир №2";
+T.mn.m1="Major #1";T.en.m1="Major #1";T.ru.m1="Мейджор №1";T.mn.m2="Major #2";T.en.m2="Major #2";T.ru.m2="Мейджор №2";
+T.mn.w="Дэлхийн финал";T.en.w="World Final";T.ru.w="Мировой финал";
+T.mn.st_win="Аварга";T.en.st_win="Champions";T.ru.st_win="Чемпионы";
+T.mn.st_f="Финалд ялагдсан";T.en.st_f="Runner-up";T.ru.st_f="Финал";
+T.mn.st_sf="Хагас финал";T.en.st_sf="Semifinal";T.ru.st_sf="Полуфинал";
+T.mn.st_qf="Шөвгийн дөрөв";T.en.st_qf="Quarterfinal";T.ru.st_qf="Четвертьфинал";
+T.mn.st_out="Бүлгийн шатнаас унав";T.en.st_out="Out in the group stage";T.ru.st_out="Вылет на групповом этапе";
+T.mn.seasonh="Улирлын явц";T.en.seasonh="Season timeline";T.ru.seasonh="Ход сезона";
+T.mn.r_l="Домогт";T.en.r_l="Legendary";T.ru.r_l="Легендарный";T.mn.r_e="Эпик";T.en.r_e="Epic";T.ru.r_e="Эпический";
+T.mn.r_r="Ховор";T.en.r_r="Rare";T.ru.r_r="Редкий";T.mn.r_c="Энгийн";T.en.r_c="Common";T.ru.r_c="Обычный";
+T.mn.legfound="✦ Домогт тоглогч гарлаа!";T.en.legfound="✦ A Legendary player appeared!";T.ru.legfound="✦ Выпал легендарный игрок!";
+T.mn.ttl="{0} Major/Финалын цом, {1} бусад цом авлаа.";T.en.ttl="{0} Major/Final title(s) and {1} other title(s).";T.ru.ttl="Титулов Мейджора/Финала: {0}, других титулов: {1}.";
+T.mn.nottl="Энэ улиралд аварга болж чадсангүй.";T.en.nottl="No titles this season.";T.ru.nottl="В этом сезоне без титулов.";
+
+T.mn.budget="Төсөв {0} / {1}";T.en.budget="Budget {0} / {1}";T.ru.budget="Бюджет {0} / {1}";
+T.mn.hint="Од тоглогч үнэтэй тул төсвөө хуваарилаарай. Нэг багийн хүмүүс chemistry өгнө (🔗).";T.en.hint="Stars are expensive, so spread your budget. Players from the same team add chemistry (🔗).";T.ru.hint="Звёзды дороги — распределяйте бюджет. Игроки из одной команды дают химию (🔗).";
+T.mn.chemtag="🔗 {0} +{1}";T.en.chemtag="🔗 {0} +{1}";T.ru.chemtag="🔗 {0} +{1}";
+var BUDGET=1000000,CHM=2.2,CAP=240,COST={l:400000,e:270000,r:170000,c:100000},CCOST={l:200000,e:130000,r:90000,c:40000},bud=0,MINC={};
+function cost(p){if(p[3]==="Coach"){var u=Math.max(0,(p[4]-78)/18);return Math.round((40000+160000*Math.pow(Math.min(u,1),1.5))/1000)*1000}
+  var a=p[4]+(p[3]==="IGL"?.15:p[3]==="Support"?.07:p[3]==="Lurker"?.05:p[3]==="Entry"?.04:0)+(p[6]-75)*.0015,u=Math.max(0,Math.min(1,(a-.95)/.40));return Math.round((55000+370000*Math.pow(u,1.7))/1000)*1000}
+function afford(p){var rest=0;for(var i=step+1;i<6;i++)rest+=MINC[ROLES[i]];return cost(p)<=bud-rest}
+function chemWith(p){var n=[],c=0;for(var i=0;i<picks.length;i++){var q=picks[i];if(!q||q===p)continue;var d=Math.abs(p[2]-q[2]);if(d<=2&&tm(p[1])===tm(q[1])){c+=(p[3]==="Coach"||q[3]==="Coach")?30-9*d:40-10*d;n.push(q[0])}}return {c:Math.round(c*CHM/10),n:n}}
+function chemTag(p){var x=chemWith(p);return x.n.length?' <span style="color:var(--acc2)">'+t("chemtag",x.n.join(", "),x.c)+'</span>':''}
+function money(n){return "$"+String(n).replace(/\B(?=(\d{3})+(?!\d))/g,",")}
+function kk(n){return "$"+Math.round(n/1000)+"K"}
+function budHtml(){return '<div class="bud"><span>💰 '+t("budget",money(bud),money(BUDGET))+'</span><div><i style="width:'+Math.round(bud/BUDGET*100)+'%"></i></div></div><div class="tm" style="margin-bottom:8px">'+t("hint")+'</div>'}
+
+var K3={
+mn:{ev_n:"Тэмцээн {0}/{1}",rec_so:"Одоогийн дүн: {0}",go_veto:"Газар сонгох (veto)",skip_all:"Үлдсэнийг автоматаар тоглох",
+vt_ban:"Хоригло: хамгийн сул 2 газраа ({0}/2)",vt_pick:"Өөрийн газраа сонго, энэ нь илүү их тоглогдоно",vt_ai:"Өрсөлдөгч таны хамгийн сайн газруудаас хориглолоо: {0}.",vt_pool:"Тоглох газрууд: {0}",
+vt_hint:"Тоо нь таны багийн тухайн газар дээрх хүч.",go_play:"Тэмцээнийг эхлүүлэх",nxt:"Дараагийн тоглолт",cont:"Үргэлжлүүлэх",evres:"{0} · {1}",fin:"Финал",stg_g:"Бүлгийн шат",finish:"Улирлын үр дүн"},
+en:{ev_n:"Event {0}/{1}",rec_so:"Season record: {0}",go_veto:"Map veto",skip_all:"Auto-play the rest",
+vt_ban:"Ban your 2 weakest maps ({0}/2)",vt_pick:"Pick your map; it will be played more often",vt_ai:"The opponent banned from your best maps: {0}.",vt_pool:"Maps in play: {0}",
+vt_hint:"The number is your team's strength on that map.",go_play:"Start the event",nxt:"Next match",cont:"Continue",evres:"{0} · {1}",fin:"Final",stg_g:"Group stage",finish:"Season results"},
+ru:{ev_n:"Турнир {0}/{1}",rec_so:"Итог сезона: {0}",go_veto:"Выбор карт (вето)",skip_all:"Доиграть остальное автоматически",
+vt_ban:"Забаньте 2 самые слабые карты ({0}/2)",vt_pick:"Выберите свою карту — она будет сыграна чаще",vt_ai:"Соперник забанил из ваших лучших карт: {0}.",vt_pool:"Карты в игре: {0}",
+vt_hint:"Число — сила вашей команды на этой карте.",go_play:"Начать турнир",nxt:"Следующий матч",cont:"Продолжить",evres:"{0} · {1}",fin:"Финал",stg_g:"Групповой этап",finish:"Итоги сезона"}};
+for(var kl in K3)for(var kk2 in K3[kl])T[kl][kk2]=K3[kl][kk2];
+
+var K4={
+mn:{menu:"Цэс",lineup:"Бүрэлдэхүүн",how_h:"Хэрхэн тоглох вэ",foot:"Фэн төсөл. HLTV болон ямар ч багтай холбоогүй. Статистик ойролцоо.",
+how:"1. 6 албан тушаалд тоглогч сонгоно: Entry, AWPer, Lurker, Support, IGL, Coach.<br>2. Төсөв $1,000,000. Од тоглогч үнэтэй тул хуваарилах хэрэгтэй.<br>3. 🔗 Нэг багт, ойролцоо жилүүдэд хамт тоглосон хүмүүс chemistry бонус өгнө.<br>4. Домогт карт ховор гарна, тиймээс дахин сугалж (reroll) үзэж болно.<br>5. Дараа нь нэг жилийн улирал: ~200 тоглолт, 5 тэмцээн. Тэмцээн бүрийн өмнө газар хориглож, сонгоно.<br>6. Картан дээрх ~ тэмдэгтэй тоо нь тооцоолсон, ✓ нь HLTV-ийн баталгаажсан статистик."},
+en:{menu:"Menu",lineup:"Lineup",how_h:"How to play",foot:"Fan project, not affiliated with HLTV or any team. Stats are approximate.",
+how:"1. Pick a player for 6 slots: Entry, AWPer, Lurker, Support, IGL, Coach.<br>2. You have a $1,000,000 budget. Stars are expensive, so spread it.<br>3. 🔗 Players who played together on one team in nearby years give a chemistry bonus.<br>4. Legendary cards are rare, so rerolling is worth a try.<br>5. Then a one-year season: ~200 matches, 5 events. Ban and pick maps before each event.<br>6. A ~ number on a card is estimated; ✓ means stats verified from HLTV."},
+ru:{menu:"Меню",lineup:"Состав",how_h:"Как играть",foot:"Фанатский проект, не связан с HLTV и командами. Статистика приблизительная.",
+how:"1. Выберите игрока на 6 позиций: Entry, AWPer, Lurker, Support, IGL, Coach.<br>2. Бюджет $1 000 000. Звёзды дороги — распределяйте деньги.<br>3. 🔗 Игроки, вместе игравшие в одной команде в близкие годы, дают бонус химии.<br>4. Легендарные карты редки, поэтому можно перемешать (reroll).<br>5. Затем сезон: ~200 матчей, 5 турниров. Перед каждым турниром баньте и выбирайте карты.<br>6. Число с ~ — оценка; ✓ — статистика подтверждена по HLTV."}};
+for(var kl4 in K4)for(var kk4 in K4[kl4])T[kl4][kk4]=K4[kl4][kk4];
+function howHtml(){return '<details><summary>'+t("how_h")+'</summary><div class="txt">'+t("how")+'</div></details>'}
+function st(p){return p[3]==="Coach"?'<div class="st"><span>'+p[4]+'<small>'+t("tactic")+'</small></span></div>':'<div class="st"><span>'+p[4].toFixed(2)+'<small>Rating</small></span><span>'+(p[7]?p[7].toFixed(2):'–')+'<small>KPR</small></span><span>'+p[6]+'<small>ADR</small></span><span>~'+Math.round(dims(p)[KEYD[p[3]]])+'<small>'+DS[KEYD[p[3]]]+'</small></span></div>'}
+function slotsHtml(){return '<div class="slots">'+ROLES.map(function(r,i){var p=picks[i];return '<div class="slot'+(i===step?' on':p?' done':'')+'">'+r+'<b>'+(p?p[0]:'–')+'</b></div>'}).join("")+'</div>'}
+function draw(){
+  screen="draw";
+  app.innerHTML=head()+slotsHtml()+budHtml()+'<div class="q">'+t("pick",ROLES[step])+'</div>'+(opts.some(function(p){return rar(p)==="l"})?'<div class="q" style="color:#ffc83d;font-size:18px">'+t("legfound")+'</div>':'')+
+  opts.map(function(p,i){var ok=afford(p);return '<button class="opt '+tier(p)+(ok?'':' off')+'" data-i="'+i+'"'+(ok?'':' disabled')+'><div class="nm">'+p[0]+(p[7]?' ✓':'')+'</div><div class="tm">'+p[1]+' · '+p[2]+' <span class="rb '+tier(p)+'">'+t("r_"+rar(p))+'</span></div>'+st(p)+'<div class="tm" style="margin-top:6px">💰 '+kk(cost(p))+chemTag(p)+'</div></button>'}).join("")+
+  (rr>0?'<button class="btn alt" id="rr">'+t("reroll",rr)+'</button>':'')+'<button class="btn alt" id="hm">'+t("menu")+'</button>';
+  var hb=document.getElementById("hm");if(hb)hb.onclick=start;var rb=document.getElementById("rr");if(rb)rb.onclick=function(){rr--;opts=roll(ROLES[step],opts);draw()};
+  [].forEach.call(app.querySelectorAll(".opt"),function(b){b.onclick=function(){var p=opts[+b.getAttribute("data-i")];if(!afford(p))return;bud-=cost(p);picks[step]=p;step++;next()}});
+  bindLang();
+}
+function chem(){
+  var c=0,pairs=[];
+  for(var i=0;i<5;i++)for(var j=i+1;j<5;j++){var d=Math.abs(picks[i][2]-picks[j][2]);if(d<=2&&tm(picks[i][1])===tm(picks[j][1])){c+=40-10*d;pairs.push([picks[i][0],picks[j][0],tm(picks[i][1])])}}
+  var co=picks[5];for(var k=0;k<5;k++){var e=Math.abs(co[2]-picks[k][2]);if(e<=2&&tm(co[1])===tm(picks[k][1])){c+=30-9*e;pairs.push([co[0],picks[k][0],tm(co[1])])}}
+  return {v:Math.min(c*CHM,CAP),pairs:pairs};
+}
+function gradeIdx(p){return p>=160?0:p>=135?1:p>=110?2:p>=92?3:4}
+var LG=[40,38,34,34,34],EVS=["s1","m1","s2","m2","w"];
+function season(td,ch){
+  var co=picks[5],ev=[],W=0,L=0,rec={},res=[],ti={m:0,w:0,s:0};
+  function mp(b,sp){var m=MAPS[Math.floor(Math.random()*7)],perf=0;for(var k=0;k<5;k++)perf+=m[1][k]*td[k];
+    var S=1500+(perf-21)*10+ch.v+40+(co[4]-80)*2,opp=b+Math.random()*sp,w=Math.random()<1/(1+Math.pow(10,(opp-S)/400));
+    var r=rec[m[0]]=rec[m[0]]||[0,0];if(w)r[0]++;else r[1]++;return w}
+  function cnt(w,o){if(w){W++;o.w++}else{L++;o.l++}res.push(w)}
+  function bo3(b){var a=0,c=0;while(a<2&&c<2){if(mp(b,350))a++;else c++}return a===2}
+  EVS.forEach(function(key,i){
+    var o={k:"lg",w:0,l:0};for(var j=0;j<LG[i];j++)cnt(mp(1500,400),o);ev.push(o);
+    var b=key[0]==="m"?1620:key==="w"?1660:1560,sw=key[0]==="m"?3:2,x={k:key,w:0,l:0,st:"out"},a=0,c=0;
+    while(a<sw&&c<sw){var w=mp(b,350);cnt(w,x);if(w)a++;else c++}
+    if(a===sw){x.st="qf";["qf","sf","f"].some(function(rn){var w=bo3(b+60);cnt(w,x);if(!w){x.st=rn;return true}if(rn==="f")x.st="win";return false})}
+    if(x.st==="win"){if(key[0]==="m")ti.m++;else if(key==="w")ti.w++;else ti.s++}
+    ev.push(x);
+  });
+  return {W:W,L:L,res:res,rec:rec,ev:ev,ti:ti,pts:W+ti.m*25+ti.w*20+ti.s*10};
+}
+var SEAS,P0=21,OB=25;
+var MV=10;
+function rawP(m){var f=0;for(var k=0;k<5;k++)f+=m[1][k]*SEAS.td[k];return f}
+function mPerf(m){var mean=0;MAPS.forEach(function(x){mean+=rawP(x)/7});return mean+MV*(rawP(m)-mean)}
+function sStr(m){return 1500+(mPerf(m)-P0)*10+SEAS.ch.v+40+(picks[5][4]-80)*2}
+function pickW(pl){var tot=0;pl.forEach(function(x){tot+=x[1]});var r=Math.random()*tot;for(var i=0;i<pl.length;i++){r-=pl[i][1];if(r<=0)return pl[i][0]}return pl[0][0]}
+function scr(w,p){var q=w?p:1-p,x=Math.max(2,Math.min(11,Math.round(13*(1-.75*q)*(.7+.6*Math.random()))));return w?"13-"+x:x+"-13"}
+function recMap(n,w){var r=SEAS.rec[n]=SEAS.rec[n]||[0,0];if(w)r[0]++;else r[1]++}
+function cnt(w,o){SEAS.res.push(w);if(w){SEAS.W++;o.w++}else{SEAS.L++;o.l++}}
+function startSeason(){
+  var pl=picks.slice(0,5);
+  SEAS={td:teamDims(),ch:chem(),avg:pl.reduce(function(s,p){return s+p[4]},0)/5,W:0,L:0,res:[],rec:{},ev:[],ti:{m:0,w:0,s:0},i:0,phase:"intro",ban:[],pk:null,aib:[],mp:null,q:[],shown:0};
+  leaguePhase();seasonScreen();
+}
+function leaguePhase(){var o={k:"lg",w:0,l:0};for(var j=0;j<LG[SEAS.i];j++){var m=MAPS[Math.floor(Math.random()*7)],S=sStr(m),opp=1500+Math.random()*400,w=Math.random()<1/(1+Math.pow(10,(opp-S)/400));recMap(m[0],w);cnt(w,o)}SEAS.ev.push(o);SEAS.phase="intro";SEAS.ban=[];SEAS.pk=null;SEAS.aib=[];SEAS.mp=null}
+function aiBans(){var rest=MAPS.filter(function(m){return SEAS.ban.indexOf(m[0])<0&&m[0]!==SEAS.pk}).sort(function(a,b){return mPerf(b)-mPerf(a)});
+  SEAS.aib=[rest[0][0],rest[1][0]];SEAS.mp=MAPS.filter(function(m){return SEAS.ban.indexOf(m[0])<0&&SEAS.aib.indexOf(m[0])<0}).map(function(m){return [m,m[0]===SEAS.pk?3:1]})}
+function autoVeto(){var o=MAPS.slice().sort(function(a,b){return mPerf(a)-mPerf(b)});SEAS.ban=[o[0][0],o[1][0]];SEAS.pk=o[o.length-1][0];aiBans()}
+function applyTour(){
+  var key=EVS[SEAS.i],b=key[0]==="m"?1620:key==="w"?1660:1560,sw=key[0]==="m"?3:2,q=[],a=0,c=0,x={k:key,w:0,l:0,st:"out"};
+  function g(bb){var m=pickW(SEAS.mp),S=sStr(m),opp=bb+Math.random()*350,p=1/(1+Math.pow(10,(opp-S)/400)),w=Math.random()<p;recMap(m[0],w);return {m:m[0],w:w,s:scr(w,p)}}
+  while(a<sw&&c<sw){var r=g(b+OB);cnt(r.w,x);q.push({st:"g",g:[r],w:r.w,sc:""});if(r.w)a++;else c++}
+  if(a===sw){x.st="qf";["qf","sf","f"].some(function(rn){var A=0,C=0,gs=[];while(A<2&&C<2){var r=g(b+OB+60);gs.push(r);if(r.w)A++;else C++}var w=A===2;cnt(w,x);q.push({st:rn,g:gs,w:w,sc:A+"-"+C});if(!w){x.st=rn;return true}if(rn==="f")x.st="win";return false})}
+  if(x.st==="win"){if(key[0]==="m")SEAS.ti.m++;else if(key==="w")SEAS.ti.w++;else SEAS.ti.s++}
+  SEAS.ev.push(x);SEAS.q=q;SEAS.shown=0;
+}
+function autoRest(){
+  if(SEAS.phase==="intro"||SEAS.phase==="veto"){autoVeto();applyTour()}
+  SEAS.i++;
+  while(SEAS.i<EVS.length){leaguePhase();autoVeto();applyTour();SEAS.i++}
+  finishSeason();
+}
+function finishSeason(){
+  var r=SEAS;RS={W:r.W,L:r.L,res:r.res,rec:r.rec,ev:r.ev,ti:r.ti,pts:r.W+r.ti.m*25+r.ti.w*20+r.ti.s*10,avg:r.avg,ch:r.ch,td:r.td};
+  lbSave({w:RS.pts,a:RS.W,b:RS.L,c:r.ti.m+r.ti.w+r.ti.s,e:eraKey,n:picks.map(function(p){return p[0]}).join(", ")});
+  showResult();
+}
+function recStr(){var w=SEAS.W,l=SEAS.L;if(SEAS.phase==="play"){var x=SEAS.ev[SEAS.ev.length-1];w-=x.w;l-=x.l;SEAS.q.slice(0,SEAS.shown).forEach(function(m){if(m.w)w++;else l++})}return w+"-"+l}
+function seasonScreen(){
+  screen="season";var S=SEAS,key=EVS[S.i],h=head()+'<div class="q">'+t("ev_n",S.i+1,EVS.length)+' · '+t(key)+'</div><div class="tm" style="margin-bottom:8px">'+t("rec_so",recStr())+'</div>',b="";
+  if(S.phase==="intro"){var lg=S.ev[S.ev.length-1];b='<div class="row"><span>'+t("lg")+'</span><i>'+lg.w+'-'+lg.l+'</i></div><button class="btn" id="gv">'+t("go_veto")+'</button><button class="btn alt" id="sk">'+t("skip_all")+'</button>'}
+  else if(S.phase==="veto"){
+    var info=S.ban.length<2?t("vt_ban",S.ban.length):!S.pk?t("vt_pick"):t("vt_ai",S.aib.join(", "))+" "+t("vt_pool",S.mp.map(function(x){return x[0][0]}).join(", "));
+    b='<div class="tm" style="margin-bottom:6px">'+t("vt_hint")+'</div><div class="q" style="font-size:18px">'+info+'</div><div class="mg">'+MAPS.map(function(m){var n=m[0],off=S.ban.indexOf(n)>=0||S.aib.indexOf(n)>=0,pk=S.pk===n;
+      return '<button class="opt '+(pk?'r-l':off?'off':'r-c')+'" data-m="'+n+'"'+((off||S.pk)?' disabled':'')+'>'+(off?'✕ ':pk?'★ ':'')+n+(S.aib.indexOf(n)>=0?'<small>AI</small>':'')+' <b>'+Math.round(mPerf(m))+'</b></button>'}).join("")+'</div>'+
+      (S.pk?'<button class="btn" id="gp">'+t("go_play")+'</button>':'')}
+  else{var x=S.ev[S.ev.length-1];
+    b=S.q.slice(0,S.shown).map(function(m){var lab=m.st==="g"?t("stg_g"):m.st==="f"?t("fin"):t("st_"+m.st);
+      var gs=m.g.map(function(r){return r.m+" "+r.s}).join(", ")+(m.sc?" ("+m.sc+")":"");
+      return '<div class="row"><span>'+lab+'<br><span class="tm">'+gs+'</span></span><i class="'+(m.w?'okc':'noc')+'">'+(m.w?'✓':'✗')+'</i></div>'}).join("");
+    if(S.shown<S.q.length)b+='<button class="btn" id="nx">'+t("nxt")+'</button>';
+    else b+='<div class="row"><span><b>'+t("evres",(x.st==="win"?'🏆 ':'')+t("st_"+x.st),x.w+'-'+x.l)+'</b></span></div><button class="btn" id="ct">'+t("cont")+'</button>';
+    b+='<button class="btn alt" id="sk">'+t("skip_all")+'</button>'}
+  app.innerHTML=h+b;
+  var e=document.getElementById("gv");if(e)e.onclick=function(){S.phase="veto";seasonScreen()};
+  e=document.getElementById("sk");if(e)e.onclick=autoRest;
+  e=document.getElementById("gp");if(e)e.onclick=function(){applyTour();S.phase="play";seasonScreen()};
+  e=document.getElementById("nx");if(e)e.onclick=function(){S.shown++;seasonScreen()};
+  e=document.getElementById("ct");if(e)e.onclick=function(){S.i++;if(S.i>=EVS.length){finishSeason()}else{leaguePhase();seasonScreen()}};
+  [].forEach.call(app.querySelectorAll(".mg .opt"),function(bt){bt.onclick=function(){var n=bt.getAttribute("data-m");if(S.ban.length<2){if(S.ban.indexOf(n)<0)S.ban.push(n)}else if(!S.pk){S.pk=n;aiBans()}seasonScreen()}});
+  bindLang();
+}
+function result(){startSeason()}
+function comment(){
+  var pl=picks.slice(0,5),gi=gradeIdx(RS.pts),awp=picks[1],igl=picks[4],co=picks[5],ch=RS.ch;
+  var best=pl.slice().sort(function(a,b){return b[4]-a[4]})[0],worst=pl.slice().sort(function(a,b){return a[4]-b[4]})[0];
+  var o=[T[LANG].v[gi],(RS.ti.m+RS.ti.w+RS.ti.s>0?t("ttl",RS.ti.m+RS.ti.w,RS.ti.s):t("nottl")),t("best",best[0],best[4].toFixed(2))];
+  if(awp[4]>=1.25)o.push(t("awphi",awp[0]));else if(awp[4]<1.15)o.push(t("awplo"));
+  if(igl!==worst)o.push(igl[4]>=1.05?t("iglhi",igl[0]):t("igllo",igl[0]));
+  if(worst!==best)o.push(t("worst",worst[0],worst[4].toFixed(2)));
+  o.push(ch.pairs.length?t("chem",ch.pairs.map(function(p){return p[0]+" + "+p[1]+" ("+p[2]+")"}).join(", ")):t("nochem"));
+  var td=RS.td,mi=0;for(var k=1;k<5;k++)if(td[k]<td[mi])mi=k;
+  if(td[mi]<42)o.push(t("dimlow",T[LANG].dims[mi].toLowerCase(),Math.round(td[mi])));
+  var ms=MAPS.map(function(m){var r=RS.rec[m[0]]||[0,0];return {n:m[0],w:m[1],r:r,p:r[0]/Math.max(1,r[0]+r[1])}}).sort(function(a,b){return b.p-a.p});
+  var bm=ms[0],wm=ms[ms.length-1];
+  if(bm.n!==wm.n){o.push(t("maprec",bm.n,bm.r[0]+"-"+bm.r[1],wm.n,wm.r[0]+"-"+wm.r[1]));
+    var wi=0,wv=-1e9;for(var q=0;q<5;q++){var v=wm.w[q]*(50-td[q]);if(v>wv){wv=v;wi=q}}
+    if(wv>0)o.push(t("mapwhy",wm.n,T[LANG].dims[wi].toLowerCase()))}
+  o.push(co[4]>=90?t("cohi",co[0]):t("colo",co[0]));
+  return o.join(" ");
+}
+function extra(){
+  var d=RS.td.map(function(v,i){return '<div class="dim"><span>'+T[LANG].dims[i]+'</span><div><i style="width:'+Math.round(v)+'%"></i></div><b>'+Math.round(v)+'</b></div>'}).join("");
+  var m='<div class="q" style="font-size:18px;margin-top:12px">'+t("mapsh")+'</div><div>'+MAPS.map(function(x){var r=RS.rec[x[0]]||[0,0];return '<span class="chip'+(r[0]>r[1]?' good':'')+'">'+x[0]+' '+r[0]+'-'+r[1]+'</span>'}).join("")+'</div>';
+  return d+m+'<div class="tm" style="margin-top:6px">'+t("est")+'</div>';
+}
+function showResult(){
+  screen="result";
+  var W=RS.W,L=RS.L,gi=gradeIdx(RS.pts),g=T[LANG].grades[gi],ti=RS.ti,nT=ti.m+ti.w+ti.s;
+  var bar='<div class="bar" role="img" aria-label="'+W+'-'+L+'">'+RS.res.map(function(w,i){return '<span class="tile" style="animation-delay:'+Math.min(i*6,1200)+'ms;background:'+(w?'var(--acc2)':'#5a2a2a')+'"></span>'}).join("")+'</div>';
+  var evs=RS.ev.map(function(e){if(e.k==="lg")return '<div class="row"><span>'+t("lg")+'</span><i>'+e.w+'-'+e.l+'</i></div>';
+    return '<div class="row"><span>'+(e.st==="win"?'🏆 ':'')+t(e.k)+'</span><i>'+t("st_"+e.st)+' · '+e.w+'-'+e.l+'</i></div>'}).join("");
+  var lineup=picks.map(function(p,i){return '<div class="row"><span>'+ROLES[i]+' · <b>'+p[0]+'</b></span><i>'+p[1]+' '+p[2]+' · '+(p[3]==="Coach"?t("tac",p[4]):p[4].toFixed(2))+'</i></div>'}).join("");
+  var txt=t("title")+" ("+t(eraKey)+"): "+W+"-"+L+(nT?" 🏆×"+nT:"")+" ("+g+")\n"+picks.map(function(p,i){return ROLES[i]+": "+p[0]+" ("+p[1]+" "+p[2]+")"}).join("\n");
+  function det(h,b,o){return '<details'+(o?' open':'')+'><summary>'+h+'</summary>'+b+'</details>'}
+  app.innerHTML=head().replace(t("sub"),t("result")+" · "+t(eraKey))+'<div class="big'+(nT>=3?' gold':'')+'">'+W+' - '+L+'</div><div class="grade g'+gi+'">'+g+(nT?' · 🏆×'+nT:'')+'</div>'+bar+
+  '<div class="txt">'+t("avg",RS.avg.toFixed(2))+' '+comment()+'</div>'+
+  '<button class="btn" id="again">'+t("again")+'</button><button class="btn alt" id="share">'+t("share")+'</button>'+
+  det(t("lineup"),lineup,true)+det(t("seasonh"),evs)+det(t("dimsh"),extra())+lbHtml();
+  countUp(app.querySelector(".big"),W,W+L);
+  document.getElementById("again").onclick=start;
+  document.getElementById("share").onclick=function(){var b=this;copyText(txt,function(){b.textContent=t("copied")},function(){b.textContent=t("fail")})};
+  bindLang();
+}
+start();
+</script>
+</body>
+</html>
